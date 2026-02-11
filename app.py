@@ -22,8 +22,7 @@ CSS = """<style>
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-    --bg: #F5F0EA;
-    --surface: #FFFFFF;
+    --bg: #F4F3F0;
     --text: #2C2520;
     --text-2: #6E645C;
     --text-3: #A69E96;
@@ -37,10 +36,7 @@ CSS = """<style>
 }
 
 .stApp {
-    background:
-        radial-gradient(ellipse at 10% -10%, rgba(181,82,42,0.045), transparent 50%),
-        radial-gradient(ellipse at 90% 110%, rgba(74,122,82,0.035), transparent 45%),
-        var(--bg) !important;
+    background: radial-gradient(ellipse at 15% 0%, rgba(140,120,100,0.04), transparent 40%), var(--bg) !important;
     color: var(--text) !important;
     font-family: 'Outfit', sans-serif !important;
 }
@@ -82,7 +78,7 @@ div[data-baseweb="radio"] label:has(input:checked) {
 div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { color: inherit !important; }
 
 .stTextInput > div > div {
-    background: var(--surface) !important;
+    background: #fff !important;
     border: 1px solid var(--border) !important;
     border-radius: 6px !important;
 }
@@ -101,7 +97,6 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     transition: opacity 0.2s !important;
 }
 .stButton > button:hover { opacity: 0.85 !important; }
-
 .stDownloadButton > button {
     background: transparent !important;
     color: var(--accent) !important;
@@ -114,20 +109,48 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
 }
 .stDownloadButton > button:hover { border-color: var(--accent) !important; }
 
+/* Expander as text link */
+div[data-testid="stExpander"] { border: none !important; }
+div[data-testid="stExpander"] details { border: none !important; background: none !important; }
+div[data-testid="stExpander"] summary {
+    padding: 0.1rem 0 0.3rem !important;
+    gap: 0.3rem !important;
+    border: none !important;
+    background: none !important;
+}
+div[data-testid="stExpander"] summary span p {
+    font-size: 0.73rem !important;
+    color: var(--accent) !important;
+}
+div[data-testid="stExpander"] summary:hover span p {
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+}
+div[data-testid="stExpander"] summary svg {
+    width: 10px !important;
+    height: 10px !important;
+    stroke: var(--accent) !important;
+}
+div[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    border: none !important;
+    background: none !important;
+    border-left: 1.5px solid var(--border-lt) !important;
+    padding: 0.4rem 0 0.4rem 1rem !important;
+    margin-left: 0.3rem !important;
+}
 .streamlit-expanderHeader {
     background: transparent !important;
     border: none !important;
-    color: var(--text-3) !important;
-    font-size: 0.78rem !important;
-    padding: 0.2rem 0 !important;
-    font-weight: 500 !important;
+    color: var(--accent) !important;
+    font-size: 0.73rem !important;
+    padding: 0.1rem 0 !important;
 }
 .streamlit-expanderContent {
     background: transparent !important;
     border: none !important;
-    border-left: 2px solid var(--border-lt) !important;
+    border-left: 1.5px solid var(--border-lt) !important;
     padding-left: 1rem !important;
-    margin-left: 2rem !important;
+    margin-left: 0.3rem !important;
 }
 
 .stSpinner > div { color: var(--accent) !important; }
@@ -136,7 +159,7 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ── Components ── */
+/* ── Hero ── */
 
 .gm-hero { padding: 0.5rem 0 2rem; }
 .gm-hero-title {
@@ -148,6 +171,15 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     margin: 0;
     letter-spacing: -0.03em;
 }
+.gm-hero-title::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 0.8rem;
+}
+.gm-hero-accent { color: var(--accent); }
 .gm-hero-sub {
     font-size: 0.92rem;
     color: var(--text-2);
@@ -155,8 +187,10 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     font-weight: 300;
 }
 
+/* ── Thread bar ── */
+
 .gm-thread-bar {
-    padding: 1rem 0;
+    padding: 1rem 0 0.3rem;
     border-top: 1px solid var(--border);
 }
 .gm-thread-bar-title {
@@ -172,35 +206,49 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     font-family: 'JetBrains Mono', monospace;
 }
 
-.gm-stats {
-    display: flex;
-    gap: 2rem;
-    padding: 0.8rem 0 0.5rem;
-    flex-wrap: wrap;
-}
-.gm-stat { display: flex; align-items: baseline; gap: 0.35rem; }
-.gm-stat-n {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1;
-}
-.gm-stat-l { font-size: 0.78rem; color: var(--text-3); }
+/* ── Section header variants ── */
 
-.gm-section {
-    padding: 2.2rem 0 0;
-    margin-bottom: 0.4rem;
-}
-.gm-section-label {
-    font-size: 0.7rem;
+.gm-sec-a { padding-top: 1.5rem; margin-bottom: 0.4rem; }
+.gm-sec-a .gm-sec-l {
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-3);
-    padding-bottom: 0.55rem;
+    padding: 0.5rem 0 0.5rem;
     border-bottom: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
 }
+
+.gm-sec-b { padding-top: 2.5rem; margin-bottom: 0.5rem; }
+.gm-sec-b .gm-sec-l {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-2);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-lt);
+    font-weight: 400;
+}
+
+.gm-sec-c { padding-top: 2rem; margin-bottom: 0.4rem; }
+.gm-sec-c .gm-sec-l {
+    font-size: 0.8rem;
+    color: var(--text-2);
+    padding-bottom: 0.4rem;
+    font-weight: 500;
+}
+
+.gm-sec-d { padding-top: 2.8rem; margin-bottom: 0.2rem; }
+.gm-sec-d .gm-sec-l {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+}
+
+/* ── Pain points ── */
 
 .gm-pp {
     padding: 1rem 0;
@@ -231,6 +279,9 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     align-items: center;
     flex-wrap: wrap;
 }
+.gm-pp-feat .gm-pp-n { color: var(--accent); font-size: 0.82rem; }
+.gm-pp-feat .gm-pp-desc { font-size: 0.95rem; font-weight: 600; }
+
 .gm-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.66rem;
@@ -252,6 +303,8 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
 .gm-sep { color: var(--border); font-size: 0.7rem; }
 .gm-cat { font-size: 0.72rem; color: var(--text-3); }
 
+/* ── Lists ── */
+
 .gm-list-item {
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--border-lt);
@@ -262,40 +315,39 @@ div[data-baseweb="radio"] label span[data-testid="stMarkdownContainer"] p { colo
     gap: 0.7rem;
 }
 .gm-list-item:last-child { border-bottom: none; }
-.gm-list-marker {
-    color: var(--text-3);
-    flex-shrink: 0;
-    font-size: 0.82rem;
-    padding-top: 1px;
-}
+.gm-list-marker { color: var(--text-3); flex-shrink: 0; font-size: 0.82rem; padding-top: 1px; }
+
+/* ── Sentiment ── */
 
 .gm-quote {
-    border-left: 2px solid var(--border);
+    border-left: 2px solid var(--accent);
     padding: 0.8rem 1.2rem;
     margin-top: 0.5rem;
     border-radius: 0 4px 4px 0;
-    background: var(--accent-soft);
 }
 .gm-quote-text {
     font-family: 'Instrument Serif', serif;
     font-style: italic;
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: var(--text-2);
     line-height: 1.7;
 }
 
-.gm-footer {
-    text-align: left;
-    padding: 3rem 0 1rem;
-    font-size: 0.7rem;
-    color: var(--text-3);
-    letter-spacing: 0.02em;
+/* ── Grain overlay ── */
+
+.gm-grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
 }
 </style>"""
 
 st.markdown(CSS, unsafe_allow_html=True)
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ── Data ──────────────────────────────────────────────────────────────────────
 
 SEV_CLASS = {
     "critical": "gm-sev-critical",
@@ -304,7 +356,7 @@ SEV_CLASS = {
     "low": "gm-sev-low",
 }
 SEV_LABEL = {"critical": "CRITICAL", "high": "HIGH", "medium": "MED", "low": "LOW"}
-INTENT_SYM = {"high": "$$$", "medium": "$$", "low": "$", "none": "—"}
+INTENT_SYM = {"high": "$$$", "medium": "$$", "low": "$", "none": "\u2014"}
 
 
 def _html(s):
@@ -316,10 +368,12 @@ def load_sample():
         return json.load(f)
 
 
+# ── Render ────────────────────────────────────────────────────────────────────
+
 def render_hero():
     _html(
         '<div class="gm-hero">'
-        '<h1 class="gm-hero-title">Reddit Goldmine<br>Analyzer</h1>'
+        '<h1 class="gm-hero-title">Reddit <span class="gm-hero-accent">Goldmine</span><br>Analyzer</h1>'
         '<p class="gm-hero-sub">Paste a Reddit thread. See what people want to pay for.</p>'
         '</div>'
     )
@@ -328,29 +382,19 @@ def render_hero():
 def render_thread(data):
     title = data.get("thread_title", "")
     n = data.get("total_comments", 0)
-    _html(
-        f'<div class="gm-thread-bar">'
-        f'<div class="gm-thread-bar-title">{title}</div>'
-        f'<div class="gm-thread-bar-meta">{n} comments analyzed</div>'
-        f'</div>'
-    )
-
-
-def render_stats(data):
     pp = len(data.get("pain_points", []))
     ins = len(data.get("key_insights", []))
     opp = len(data.get("market_opportunities", []))
     _html(
-        '<div class="gm-stats">'
-        f'<div class="gm-stat"><span class="gm-stat-n">{pp}</span><span class="gm-stat-l">pain points</span></div>'
-        f'<div class="gm-stat"><span class="gm-stat-n">{ins}</span><span class="gm-stat-l">insights</span></div>'
-        f'<div class="gm-stat"><span class="gm-stat-n">{opp}</span><span class="gm-stat-l">opportunities</span></div>'
-        '</div>'
+        f'<div class="gm-thread-bar">'
+        f'<div class="gm-thread-bar-title">{title}</div>'
+        f'<div class="gm-thread-bar-meta">{n} comments &rarr; {pp} pain points, {ins} insights, {opp} opportunities</div>'
+        f'</div>'
     )
 
 
-def render_section(label):
-    _html(f'<div class="gm-section"><div class="gm-section-label">{label}</div></div>')
+def render_section(label, style="a"):
+    _html(f'<div class="gm-sec-{style}"><div class="gm-sec-l">{label}</div></div>')
 
 
 def render_pain_point(pp, idx):
@@ -363,11 +407,12 @@ def render_pain_point(pp, idx):
 
     sev_cls = SEV_CLASS.get(sev, "gm-sev-medium")
     sev_lbl = SEV_LABEL.get(sev, "MED")
-    intent_sym = INTENT_SYM.get(intent, "—")
+    intent_sym = INTENT_SYM.get(intent, "\u2014")
     num = f"{idx:02d}"
+    feat = " gm-pp-feat" if idx == 1 else ""
 
     _html(
-        f'<div class="gm-pp">'
+        f'<div class="gm-pp{feat}">'
         f'<div class="gm-pp-n">{num}</div>'
         f'<div class="gm-pp-body">'
         f'<div class="gm-pp-desc">{desc}</div>'
@@ -430,14 +475,13 @@ def render_sentiment(text):
 
 def render_analysis(data):
     render_thread(data)
-    render_stats(data)
 
     pain_points = data.get("pain_points", [])
     insights = data.get("key_insights", [])
     opportunities = data.get("market_opportunities", [])
     sentiment = data.get("sentiment_summary", "")
 
-    render_section("Pain Points")
+    render_section("Pain Points", "a")
     intent_order = {"high": 4, "medium": 3, "low": 2, "none": 1}
     sorted_pps = sorted(
         pain_points,
@@ -447,13 +491,13 @@ def render_analysis(data):
     for i, pp in enumerate(sorted_pps, 1):
         render_pain_point(pp, i)
 
-    render_section("Key Insights")
+    render_section("Key Insights", "b")
     render_insights(insights)
 
-    render_section("Market Opportunities")
+    render_section("Market Opportunities", "c")
     render_opportunities(opportunities)
 
-    render_section("Sentiment")
+    render_section("Sentiment", "d")
     render_sentiment(sentiment)
 
     _html('<div style="height:1.5rem"></div>')
@@ -541,4 +585,6 @@ else:
         except Exception as e:
             st.error(str(e))
 
-_html('<div class="gm-footer">Reddit Goldmine Analyzer &mdash; MIT License</div>')
+# Grain overlay + minimal footer
+_html('<div class="gm-grain"></div>')
+_html('<div style="padding:3rem 0 1rem; font-size:0.65rem; color:var(--text-3);">MIT License</div>')
