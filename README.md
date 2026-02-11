@@ -103,7 +103,7 @@ python goldmine_finder.py --batch urls.txt --output my_analysis/
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/yourname/reddit_goldmine_analyzer.git
+git clone https://github.com/yu010101/reddit_goldmine_analyzer.git
 cd reddit_goldmine_analyzer
 pip install -r requirements.txt
 ```
