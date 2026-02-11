@@ -8,8 +8,9 @@ Discover customer pain points, purchase intent, and market opportunities — at 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/)
 
-[Web Demo](#-web-demo) · [CLI Usage](#-cli-usage) · [Quick Start](#-quick-start) · [日本語](README_ja.md)
+[Live Demo](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/) · [CLI Usage](#-cli-usage) · [Quick Start](#-quick-start) · [日本語](README_ja.md)
 
 </div>
 
@@ -52,6 +53,10 @@ Reddit URL → reddit_fetcher.py → ai_analyzer.py → Report (MD + JSON)
 ## Web Demo
 
 Try it instantly in your browser — **no API key required** for the sample data mode.
+
+**[Launch Live Demo](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/)**
+
+Or run locally:
 
 ```bash
 pip install -r requirements.txt
