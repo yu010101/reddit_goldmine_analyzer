@@ -1,0 +1,64 @@
+{
+  "thread_id": "1pyxz90",
+  "thread_title": "\ud83c\udf99\ufe0f Episode 001: Christian Reed (Founder of REEKON Tools) | /r/Entrepreneur Podcast",
+  "total_comments": 12,
+  "pain_points": [
+    {
+      "description": "Poor video production quality in podcasts — camera angles, framing, lighting, and background set design degrade the viewing experience",
+      "severity": "medium",
+      "frequency_mentioned": 1,
+      "example_comments": [
+        "A couple of things I noticed just right off the bat is the camera angle and head spacing between the guest and the hosts are just way off.",
+        "The set could also use some work. Right now, it's very much like a green screen type of background with the green drapes and green wall, and it doesn't feel like there's any separation really between the subject and the background.",
+        "Lighting overall feels harsh. Subject is very well-lit and the background is also well-lit, there should be some contrast so it doesn't feel equally well-lit."
+      ],
+      "purchase_intent": "medium",
+      "category": "Production Quality"
+    },
+    {
+      "description": "Limited podcast distribution — not available on major platforms like Apple Podcasts and Spotify, making it hard for listeners to access",
+      "severity": "medium",
+      "frequency_mentioned": 2,
+      "example_comments": [
+        "Will it be available on Apple Podcasts, Spotify, RSS etc too? Searched Apple Podcasts but haven't been able to find it.",
+        "Yes, we were trying to upload to Reddit first, then the subsequent platforms."
+      ],
+      "purchase_intent": "low",
+      "category": "Distribution & Access"
+    },
+    {
+      "description": "Challenges with manufacturing and distribution in hardware product businesses — costly mistakes and high-risk decisions",
+      "severity": "high",
+      "frequency_mentioned": 1,
+      "example_comments": [
+        "Curious to hear about Christian's expensive mistakes.",
+        "Turning a personal pain point into a real company",
+        "What surprised him most about manufacturing and distribution"
+      ],
+      "purchase_intent": "high",
+      "category": "Manufacturing & Operations"
+    },
+    {
+      "description": "Complexity of running a business due to different cost structures and scaling dynamics between software and hardware product development",
+      "severity": "medium",
+      "frequency_mentioned": 1,
+      "example_comments": [
+        "We built our first agent prototype in 4 days. Cost us $30 in OpenAI API calls. Getting to that first functional version is fast with software.",
+        "The difference in fixed costs must be wild."
+      ],
+      "purchase_intent": "low",
+      "category": "Technology & Business Model"
+    }
+  ],
+  "key_insights": [
+    "Hardware product businesses require fundamentally different, higher-cost and higher-risk decision-making in manufacturing and distribution compared to software.",
+    "Video production quality (camera work, lighting, set design) significantly impacts viewer satisfaction for podcasts.",
+    "Diversifying distribution platforms and improving accessibility is critical for audience growth — limited distribution leads to missed opportunities."
+  ],
+  "market_opportunities": [
+    "Consulting services or tools to help podcast and online video creators improve their video production quality.",
+    "Specialized consulting for hardware startups on manufacturing/distribution risk management and cost optimization.",
+    "A SaaS tool that automates multi-platform podcast distribution and simplifies distribution management."
+  ],
+  "sentiment_summary": "Overall sentiment is predominantly positive, with favorable reactions to the podcast content and guest's appeal. However, improvement requests exist regarding production quality and limited distribution platforms, which are seen as growth opportunities."
+}
