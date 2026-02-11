@@ -58,8 +58,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-<!-- Screenshot placeholder: replace with actual screenshot -->
-<!-- ![Web UI Screenshot](docs/screenshot_web_ui.png) -->
+![Web UI Screenshot](docs/screenshot_web_ui.png)
 
 **Features:**
 - **Sample Data Mode** — explore pre-analyzed results instantly, no API key needed
