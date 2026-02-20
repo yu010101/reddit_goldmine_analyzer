@@ -63,8 +63,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-<!-- Replace with docs/demo.gif once recorded (see scripts/record_demo.sh) -->
-![Web UI Screenshot](docs/screenshot_web_ui.png)
+![Demo](docs/demo.gif)
 
 **Features:**
 - **Sample Data Mode** — explore pre-analyzed results instantly, no API key needed
