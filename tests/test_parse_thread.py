@@ -163,6 +163,30 @@ class TestParseThreadNoCommentSection:
         assert thread.comments == []
 
 
+class TestParseThreadMalformedData:
+    """Malformed Reddit responses raise ValueError instead of crashing."""
+
+    def test_empty_list(self):
+        fetcher = RedditFetcher()
+        with pytest.raises(ValueError, match="Unexpected Reddit API response"):
+            fetcher._parse_thread([])
+
+    def test_missing_data_key(self):
+        fetcher = RedditFetcher()
+        with pytest.raises(ValueError, match="Unexpected Reddit API response"):
+            fetcher._parse_thread([{"kind": "Listing"}])
+
+    def test_empty_children(self):
+        fetcher = RedditFetcher()
+        with pytest.raises(ValueError, match="Unexpected Reddit API response"):
+            fetcher._parse_thread([{"data": {"children": []}}])
+
+    def test_none_input(self):
+        fetcher = RedditFetcher()
+        with pytest.raises((ValueError, TypeError)):
+            fetcher._parse_thread(None)
+
+
 class TestParseThreadCommentFields:
     def test_comment_gilded(self):
         fetcher = RedditFetcher()

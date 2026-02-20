@@ -93,6 +93,9 @@ class RedditFetcher:
         except json.JSONDecodeError as e:
             logger.error("Failed to parse JSON: %s", e)
             return None
+        except ValueError as e:
+            logger.error("Failed to parse thread: %s", e)
+            return None
 
     def _parse_post_listing(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Parse a Reddit listing response into a list of post dicts."""
@@ -186,7 +189,10 @@ class RedditFetcher:
 
     def _parse_thread(self, data: List[Dict]) -> Thread:
         """Build Thread object from JSON data"""
-        post_listing = data[0]['data']['children'][0]['data']
+        try:
+            post_listing = data[0]['data']['children'][0]['data']
+        except (IndexError, KeyError, TypeError) as e:
+            raise ValueError(f"Unexpected Reddit API response structure: {e}") from e
 
         thread = Thread(
             id=post_listing.get('id', ''),
