@@ -4,12 +4,18 @@ Reddit JSON Fetcher
 Fetches and structures data from Reddit threads in JSON format
 """
 
-import requests
 import json
+import logging
 import time
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from datetime import datetime
+
+import requests
+
+import config as cfg
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -53,11 +59,11 @@ class Thread:
 class RedditFetcher:
     """Reddit JSON API Fetcher"""
 
-    def __init__(self, user_agent: str = "RedditGoldmineAnalyzer/1.0 (Educational Research)"):
-        self.user_agent = user_agent
+    def __init__(self, user_agent: str | None = None, rate_limit_delay: float | None = None):
+        self.user_agent = user_agent or cfg.USER_AGENT
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': self.user_agent})
-        self.rate_limit_delay = 2  # seconds
+        self.rate_limit_delay = rate_limit_delay if rate_limit_delay is not None else cfg.RATE_LIMIT_DELAY
 
     def fetch_thread(self, url: str) -> Optional[Thread]:
         """
@@ -73,7 +79,7 @@ class RedditFetcher:
 
         try:
             time.sleep(self.rate_limit_delay)
-            response = self.session.get(json_url, timeout=30)
+            response = self.session.get(json_url, timeout=cfg.REQUEST_TIMEOUT)
             response.raise_for_status()
 
             data = response.json()
@@ -82,11 +88,44 @@ class RedditFetcher:
             return thread
 
         except requests.exceptions.RequestException as e:
-            print(f"Error: Failed to fetch data - {e}")
+            logger.error("Failed to fetch data: %s", e)
             return None
         except json.JSONDecodeError as e:
-            print(f"Error: Failed to parse JSON - {e}")
+            logger.error("Failed to parse JSON: %s", e)
             return None
+
+    def _parse_post_listing(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Parse a Reddit listing response into a list of post dicts."""
+        posts = []
+        for child in data.get('data', {}).get('children', []):
+            post_data = child.get('data', {})
+            posts.append({
+                'id': post_data.get('id'),
+                'title': post_data.get('title'),
+                'author': post_data.get('author'),
+                'score': post_data.get('score'),
+                'num_comments': post_data.get('num_comments'),
+                'url': post_data.get('url'),
+                'permalink': f"https://www.reddit.com{post_data.get('permalink')}",
+                'created_utc': post_data.get('created_utc'),
+                'selftext': post_data.get('selftext', ''),
+                'subreddit': post_data.get('subreddit', ''),
+            })
+        return posts
+
+    def _fetch_listing(self, url: str) -> List[Dict[str, Any]]:
+        """Fetch and parse a subreddit listing URL."""
+        try:
+            time.sleep(self.rate_limit_delay)
+            response = self.session.get(url, timeout=cfg.REQUEST_TIMEOUT)
+            response.raise_for_status()
+            return self._parse_post_listing(response.json())
+        except requests.exceptions.RequestException as e:
+            logger.error("Failed to fetch subreddit: %s", e)
+            return []
+        except json.JSONDecodeError as e:
+            logger.error("Failed to parse subreddit JSON: %s", e)
+            return []
 
     def fetch_subreddit_hot(self, subreddit: str, limit: int = 25) -> List[Dict[str, Any]]:
         """
@@ -100,34 +139,36 @@ class RedditFetcher:
             List[Dict]: List of posts
         """
         url = f"https://old.reddit.com/r/{subreddit}/hot.json?limit={min(limit, 100)}"
+        return self._fetch_listing(url)
 
-        try:
-            time.sleep(self.rate_limit_delay)
-            response = self.session.get(url, timeout=30)
-            response.raise_for_status()
+    def fetch_subreddit_top(self, subreddit: str, time_filter: str = "week", limit: int = 25) -> List[Dict[str, Any]]:
+        """
+        Fetch top posts from a subreddit.
 
-            data = response.json()
-            posts = []
+        Args:
+            subreddit: Subreddit name (e.g., "Entrepreneur")
+            time_filter: Time filter (hour, day, week, month, year, all)
+            limit: Number of posts to fetch (max 100)
 
-            for child in data.get('data', {}).get('children', []):
-                post_data = child.get('data', {})
-                posts.append({
-                    'id': post_data.get('id'),
-                    'title': post_data.get('title'),
-                    'author': post_data.get('author'),
-                    'score': post_data.get('score'),
-                    'num_comments': post_data.get('num_comments'),
-                    'url': post_data.get('url'),
-                    'permalink': f"https://www.reddit.com{post_data.get('permalink')}",
-                    'created_utc': post_data.get('created_utc'),
-                    'selftext': post_data.get('selftext', ''),
-                })
+        Returns:
+            List[Dict]: List of posts
+        """
+        url = f"https://old.reddit.com/r/{subreddit}/top.json?t={time_filter}&limit={min(limit, 100)}"
+        return self._fetch_listing(url)
 
-            return posts
+    def fetch_subreddit_new(self, subreddit: str, limit: int = 25) -> List[Dict[str, Any]]:
+        """
+        Fetch new posts from a subreddit.
 
-        except Exception as e:
-            print(f"Error: Failed to fetch subreddit - {e}")
-            return []
+        Args:
+            subreddit: Subreddit name (e.g., "Entrepreneur")
+            limit: Number of posts to fetch (max 100)
+
+        Returns:
+            List[Dict]: List of posts
+        """
+        url = f"https://old.reddit.com/r/{subreddit}/new.json?limit={min(limit, 100)}"
+        return self._fetch_listing(url)
 
     def _normalize_url(self, url: str) -> str:
         """Normalize URL to JSON API endpoint"""
@@ -233,7 +274,7 @@ class RedditFetcher:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(thread_dict, f, ensure_ascii=False, indent=2)
 
-        print(f"Data saved: {filepath}")
+        logger.info("Data saved: %s", filepath)
 
     def get_all_comments_flat(self, thread: Thread) -> List[Comment]:
         """Get all comments in a thread as a flat list"""
@@ -251,29 +292,32 @@ class RedditFetcher:
 
 # Usage example
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
     fetcher = RedditFetcher()
 
-    print("=== Fetching hot posts from r/Entrepreneur... ===")
+    logger.info("=== Fetching hot posts from r/Entrepreneur... ===")
     hot_posts = fetcher.fetch_subreddit_hot("Entrepreneur", limit=5)
 
     for i, post in enumerate(hot_posts, 1):
-        print(f"\n{i}. {post['title']}")
-        print(f"   Score: {post['score']} | Comments: {post['num_comments']}")
-        print(f"   URL: {post['permalink']}")
+        logger.info("%d. %s", i, post['title'])
+        logger.info("   Score: %s | Comments: %s", post['score'], post['num_comments'])
+        logger.info("   URL: %s", post['permalink'])
 
     if hot_posts:
-        print(f"\n\n=== Fetching details of the first thread... ===")
+        logger.info("=== Fetching details of the first thread... ===")
         first_post_url = hot_posts[0]['permalink']
         thread = fetcher.fetch_thread(first_post_url)
 
         if thread:
-            print(f"\nTitle: {thread.title}")
-            print(f"Author: {thread.author}")
-            print(f"Score: {thread.score}")
-            print(f"Comments: {thread.num_comments}")
-            print(f"Body: {thread.selftext[:200]}..." if len(thread.selftext) > 200 else f"Body: {thread.selftext}")
+            logger.info("Title: %s", thread.title)
+            logger.info("Author: %s", thread.author)
+            logger.info("Score: %s", thread.score)
+            logger.info("Comments: %s", thread.num_comments)
+            body_preview = thread.selftext[:200] + "..." if len(thread.selftext) > 200 else thread.selftext
+            logger.info("Body: %s", body_preview)
 
             all_comments = fetcher.get_all_comments_flat(thread)
-            print(f"\nTotal comments fetched: {len(all_comments)}")
+            logger.info("Total comments fetched: %d", len(all_comments))
 
             fetcher.save_to_json(thread, f"thread_{thread.id}.json")

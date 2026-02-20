@@ -1,0 +1,106 @@
+{
+  "thread_id": "1r3kx7m",
+  "thread_title": "What's the single biggest wall you hit building your SaaS?",
+  "total_comments": 87,
+  "key_finding": "12 people cited churn management as their #1 challenge, and 9 are actively looking for paid solutions",
+  "pain_points": [
+    {
+      "description": "Customer churn is silent and deadly — users cancel without warning, and founders only notice when MRR drops",
+      "severity": "critical",
+      "frequency_mentioned": 12,
+      "example_comments": [
+        "We lost 23% of our users last quarter and didn't even notice until the bank account looked thin.",
+        "Churn is the thing nobody warns you about. You celebrate signups but ignore the back door.",
+        "I built alerts for everything except customers leaving. That was a $40k mistake."
+      ],
+      "purchase_intent": "high",
+      "category": "Retention & Churn"
+    },
+    {
+      "description": "Pricing strategy is pure guesswork — founders have no data on willingness to pay and constantly second-guess their tiers",
+      "severity": "high",
+      "frequency_mentioned": 9,
+      "example_comments": [
+        "I've changed my pricing page 11 times in 6 months. Still have no idea if it's right.",
+        "Went from $29/mo to $49/mo and lost 5% of users but revenue went up 40%. Should have done it sooner.",
+        "Nobody teaches you how to price a SaaS. I just copied my competitor and hoped for the best."
+      ],
+      "purchase_intent": "high",
+      "category": "Pricing & Monetization"
+    },
+    {
+      "description": "Onboarding drop-off is massive — users sign up but never complete setup, leading to wasted acquisition spend",
+      "severity": "high",
+      "frequency_mentioned": 8,
+      "example_comments": [
+        "60% of signups never finish onboarding. That's 60% of my ad budget going straight to the trash.",
+        "We added a 3-step wizard and activation went from 18% to 41%. Onboarding is the real product.",
+        "If your time-to-value is more than 5 minutes, you've already lost them."
+      ],
+      "purchase_intent": "high",
+      "category": "User Onboarding"
+    },
+    {
+      "description": "Building features nobody asked for — founders spend months on roadmap items that don't move the needle",
+      "severity": "high",
+      "frequency_mentioned": 7,
+      "example_comments": [
+        "Spent 3 months building an analytics dashboard. Our users wanted CSV export. That's it.",
+        "Stop building what you think is cool and start building what people are literally begging for in support tickets.",
+        "I now run every feature idea through a 'will this reduce churn or increase upgrades?' filter."
+      ],
+      "purchase_intent": "medium",
+      "category": "Product Strategy"
+    },
+    {
+      "description": "Infrastructure costs spiral out of control as the product scales — AWS bills become the second biggest expense after salaries",
+      "severity": "medium",
+      "frequency_mentioned": 6,
+      "example_comments": [
+        "Our AWS bill went from $200/mo to $3,400/mo in 4 months. We weren't even at 1k users.",
+        "I spent a weekend optimizing Lambda functions and saved $800/mo. Should have done it month one.",
+        "Nobody tells you that 'serverless' doesn't mean 'free at scale'."
+      ],
+      "purchase_intent": "medium",
+      "category": "Infrastructure & Costs"
+    },
+    {
+      "description": "Support burden grows faster than the team — solo founders drown in tickets while trying to ship features",
+      "severity": "medium",
+      "frequency_mentioned": 5,
+      "example_comments": [
+        "I spend 3 hours a day on support tickets. That's 3 hours I'm not building the product.",
+        "Hired a part-time support person and my shipping velocity doubled overnight.",
+        "The support-to-feature ratio is the metric nobody tracks but everyone should."
+      ],
+      "purchase_intent": "medium",
+      "category": "Customer Support"
+    },
+    {
+      "description": "Getting the first 10 paying customers is harder than building the entire product",
+      "severity": "high",
+      "frequency_mentioned": 11,
+      "example_comments": [
+        "Built the product in 2 weeks. Took 4 months to find 10 paying customers.",
+        "Your first 10 customers won't come from marketing. They come from DMs, cold emails, and shameless self-promotion.",
+        "I posted in 47 communities before one person paid me $29/month. Worth it."
+      ],
+      "purchase_intent": "low",
+      "category": "Early Traction"
+    }
+  ],
+  "key_insights": [
+    "Churn management is the most financially impactful problem but the least tooled — most founders detect churn reactively, not proactively.",
+    "Pricing experimentation is treated as a one-time decision rather than an ongoing optimization process — there is a clear gap for data-driven pricing tools.",
+    "Onboarding quality has a 2-3x multiplier effect on all other metrics — fixing onboarding is the highest-leverage improvement for early SaaS.",
+    "Solo founders consistently underestimate the support burden — the transition from 0 to 1 support hire is a critical inflection point.",
+    "Infrastructure cost awareness is low until it becomes a crisis — proactive cost monitoring is underutilized."
+  ],
+  "market_opportunities": [
+    "A churn prediction and intervention platform specifically for early-stage SaaS (sub-1000 users) — current tools like ChurnZero target enterprise.",
+    "An AI-powered pricing experimentation tool that runs willingness-to-pay surveys and A/B tests pricing pages automatically.",
+    "A plug-and-play onboarding analytics SDK that identifies exactly where users drop off and suggests fixes based on benchmarks.",
+    "A SaaS-specific infrastructure cost optimizer that scans AWS/GCP configs and recommends savings — positioned for bootstrapped founders, not DevOps teams."
+  ],
+  "sentiment_summary": "The discussion is energetic and highly practical, with founders openly sharing expensive mistakes and hard-won lessons. There is a strong undercurrent of frustration around churn and pricing — problems that feel unsolvable without better tools. The tone shifts to optimism when people share specific tactics that worked, especially around onboarding improvements and pricing experiments."
+}

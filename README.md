@@ -141,12 +141,19 @@ reddit_goldmine_analyzer/
 ├── goldmine_finder.py     # CLI tool (main entry point)
 ├── reddit_fetcher.py      # Reddit JSON API fetcher
 ├── ai_analyzer.py         # AI analysis engine
+├── config.py              # Centralized configuration (env var overrides)
 ├── demo.py                # Quick demo script
 ├── examples/              # Sample data (works without API key)
 │   ├── sample_thread.json
 │   ├── sample_analysis.json
+│   ├── sample_analysis_saas.json
+│   ├── sample_analysis_sideproject.json
+│   ├── sample_analysis_startups.json
 │   └── sample_report.md
-├── docs/                  # Documentation (Japanese)
+├── tests/                 # Unit & integration tests (pytest)
+├── docs/                  # Documentation (English & Japanese)
+├── Dockerfile             # Container setup
+├── docker-compose.yml     # Docker Compose config
 ├── requirements.txt
 ├── LICENSE
 ├── README.md              # This file (English)

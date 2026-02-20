@@ -5,10 +5,15 @@ Extracts pain points, purchase intent, and need patterns from Reddit comments us
 """
 
 import json
+import logging
 import os
 from typing import List, Dict, Any
 from dataclasses import dataclass
 from openai import OpenAI
+
+import config as cfg
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -32,18 +37,20 @@ class AnalysisResult:
     key_insights: List[str]
     market_opportunities: List[str]
     sentiment_summary: str
+    analyzed_comments: int = 0
 
 
 class AIAnalyzer:
     """AI Analysis Engine"""
 
-    def __init__(self, model: str = "gpt-4.1-mini"):
+    def __init__(self, model: str | None = None, api_key: str | None = None):
         """
         Args:
-            model: Model to use (gpt-4.1-mini, gpt-4.1-nano, gemini-2.5-flash)
+            model: Model to use. Defaults to config.MODEL.
+            api_key: OpenAI API key. Falls back to OPENAI_API_KEY env var if None.
         """
-        self.client = OpenAI()
-        self.model = model
+        self.client = OpenAI(api_key=api_key) if api_key else OpenAI()
+        self.model = model or cfg.MODEL
 
     def analyze_thread(self, thread_data: Dict[str, Any]) -> AnalysisResult:
         """
@@ -61,23 +68,33 @@ class AIAnalyzer:
         # Extract comment texts
         comment_texts = [c['body'] for c in all_comments if c['body'] and len(c['body']) > 10]
 
-        print(f"Analyzing: processing {len(comment_texts)} comments...")
+        max_comments = cfg.MAX_COMMENTS
+        total = len(comment_texts)
+        capped = comment_texts[:max_comments]
+
+        if total > max_comments:
+            logger.warning(
+                "Comment limit: %d total, analyzing first %d",
+                total, max_comments,
+            )
+        logger.info("Analyzing: processing %d comments...", len(capped))
 
         # Batch AI analysis
         analysis = self._analyze_with_ai(
             thread_title=thread_data.get('title', ''),
             thread_body=thread_data.get('selftext', ''),
-            comments=comment_texts[:100]  # Up to 100 comments
+            comments=capped,
         )
 
         return AnalysisResult(
             thread_id=thread_data.get('id', ''),
             thread_title=thread_data.get('title', ''),
-            total_comments=len(comment_texts),
+            total_comments=total,
             pain_points=analysis['pain_points'],
             key_insights=analysis['key_insights'],
             market_opportunities=analysis['market_opportunities'],
-            sentiment_summary=analysis['sentiment_summary']
+            sentiment_summary=analysis['sentiment_summary'],
+            analyzed_comments=len(capped),
         )
 
     def _flatten_comments(self, comments: List[Dict], result: List[Dict] = None) -> List[Dict]:
@@ -96,7 +113,9 @@ class AIAnalyzer:
         """Analyze comments using AI"""
 
         # Combine comments
-        comments_text = "\n\n---\n\n".join([f"Comment {i+1}: {c}" for i, c in enumerate(comments[:50])])
+        comments_text = "\n\n---\n\n".join(
+            [f"Comment {i+1}: {c}" for i, c in enumerate(comments[:cfg.MAX_COMMENTS_IN_PROMPT])]
+        )
 
         prompt = f"""You are an expert in market research and business opportunity discovery.
 Analyze the following Reddit thread and comments, then extract customer "pain points", "purchase intent", and "market opportunities".
@@ -150,7 +169,7 @@ Important instructions:
                     {"role": "system", "content": "You are a market research expert. Respond only in JSON format."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3,
+                temperature=cfg.TEMPERATURE,
                 response_format={"type": "json_object"}
             )
 
@@ -177,13 +196,8 @@ Important instructions:
             }
 
         except Exception as e:
-            print(f"AI analysis error: {e}")
-            return {
-                'pain_points': [],
-                'key_insights': [],
-                'market_opportunities': [],
-                'sentiment_summary': 'Analysis failed due to an error'
-            }
+            logger.error("AI analysis error: %s", e)
+            raise
 
     def save_analysis(self, result: AnalysisResult, filepath: str):
         """Save analysis results to a JSON file"""
@@ -210,7 +224,7 @@ Important instructions:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"Analysis saved: {filepath}")
+        logger.info("Analysis saved: %s", filepath)
 
     def generate_report(self, result: AnalysisResult) -> str:
         """Generate a human-readable report from analysis results"""
@@ -303,17 +317,19 @@ Important instructions:
 if __name__ == "__main__":
     import glob
 
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
     thread_files = glob.glob("thread_*.json")
     if not thread_files:
-        print("No thread data found for analysis.")
-        print("Please run reddit_fetcher.py first.")
+        logger.info("No thread data found for analysis.")
+        logger.info("Please run reddit_fetcher.py first.")
     else:
         analyzer = AIAnalyzer()
 
         for thread_file in thread_files[:1]:
-            print(f"\n{'='*60}")
-            print(f"Starting analysis: {thread_file}")
-            print(f"{'='*60}\n")
+            logger.info("\n%s", "=" * 60)
+            logger.info("Starting analysis: %s", thread_file)
+            logger.info("%s\n", "=" * 60)
 
             with open(thread_file, 'r', encoding='utf-8') as f:
                 thread_data = json.load(f)
@@ -331,5 +347,5 @@ if __name__ == "__main__":
             with open(report_file, 'w', encoding='utf-8') as f:
                 f.write(report)
 
-            print(f"\nReport saved: {report_file}")
-            print(f"\n{report}")
+            logger.info("Report saved: %s", report_file)
+            logger.info("\n%s", report)

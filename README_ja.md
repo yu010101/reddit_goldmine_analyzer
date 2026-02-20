@@ -257,8 +257,6 @@ https://www.reddit.com/r/Entrepreneur/comments/1pyxz90/episode_001/.json
 analyzer = AIAnalyzer(model="gpt-4.1-mini")  # デフォルト
 # または
 analyzer = AIAnalyzer(model="gpt-4.1-nano")  # より高速・低コスト
-# または
-analyzer = AIAnalyzer(model="gemini-2.5-flash")  # Google Gemini
 ```
 
 ### レート制限の調整

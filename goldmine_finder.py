@@ -6,11 +6,14 @@ Main tool for discovering "goldmines" from Reddit threads using AI
 
 import argparse
 import json
+import logging
 import os
 import sys
 from typing import List, Dict
 from reddit_fetcher import RedditFetcher
 from ai_analyzer import AIAnalyzer
+
+logger = logging.getLogger(__name__)
 
 
 class GoldmineFinder:
@@ -25,25 +28,25 @@ class GoldmineFinder:
 
     def analyze_single_thread(self, url: str) -> Dict:
         """Analyze a single thread"""
-        print(f"\n{'='*70}")
-        print(f"Starting thread analysis: {url}")
-        print(f"{'='*70}\n")
+        logger.info("=" * 70)
+        logger.info("Starting thread analysis: %s", url)
+        logger.info("=" * 70)
 
-        print("Fetching thread data...")
+        logger.info("Fetching thread data...")
         thread = self.fetcher.fetch_thread(url)
 
         if not thread:
-            print("Failed to fetch thread")
+            logger.error("Failed to fetch thread")
             return None
 
-        print(f"Fetched: {thread.num_comments} comments")
+        logger.info("Fetched: %d comments", thread.num_comments)
 
         thread_file = os.path.join(self.output_dir, f"thread_{thread.id}.json")
         self.fetcher.save_to_json(thread, thread_file)
 
         thread_dict = self._thread_to_dict(thread)
 
-        print("\nRunning AI analysis...")
+        logger.info("Running AI analysis...")
         result = self.analyzer.analyze_thread(thread_dict)
 
         analysis_file = os.path.join(self.output_dir, f"analysis_{thread.id}.json")
@@ -55,9 +58,9 @@ class GoldmineFinder:
         with open(report_file, 'w', encoding='utf-8') as f:
             f.write(report)
 
-        print(f"\nAnalysis complete!")
-        print(f"Report: {report_file}")
-        print(f"Analysis data: {analysis_file}")
+        logger.info("Analysis complete!")
+        logger.info("Report: %s", report_file)
+        logger.info("Analysis data: %s", analysis_file)
 
         return {
             'thread': thread_dict,
@@ -67,28 +70,28 @@ class GoldmineFinder:
 
     def analyze_subreddit(self, subreddit: str, limit: int = 10, min_comments: int = 5) -> List[Dict]:
         """Analyze multiple threads from a subreddit"""
-        print(f"\n{'='*70}")
-        print(f"Subreddit analysis: r/{subreddit}")
-        print(f"{'='*70}\n")
+        logger.info("=" * 70)
+        logger.info("Subreddit analysis: r/%s", subreddit)
+        logger.info("=" * 70)
 
-        print(f"Fetching hot posts from r/{subreddit}...")
+        logger.info("Fetching hot posts from r/%s...", subreddit)
         posts = self.fetcher.fetch_subreddit_hot(subreddit, limit=limit)
 
         if not posts:
-            print("Failed to fetch posts")
+            logger.error("Failed to fetch posts")
             return []
 
-        print(f"Fetched {len(posts)} posts")
+        logger.info("Fetched %d posts", len(posts))
 
         filtered_posts = [p for p in posts if p['num_comments'] >= min_comments]
-        print(f"{len(filtered_posts)} posts meet the minimum {min_comments} comments threshold")
+        logger.info("%d posts meet the minimum %d comments threshold", len(filtered_posts), min_comments)
 
         results = []
 
         for i, post in enumerate(filtered_posts, 1):
-            print(f"\n--- [{i}/{len(filtered_posts)}] ---")
-            print(f"Title: {post['title']}")
-            print(f"Comments: {post['num_comments']}")
+            logger.info("--- [%d/%d] ---", i, len(filtered_posts))
+            logger.info("Title: %s", post['title'])
+            logger.info("Comments: %d", post['num_comments'])
 
             result = self.analyze_single_thread(post['permalink'])
             if result:
@@ -100,14 +103,14 @@ class GoldmineFinder:
 
     def batch_analyze_urls(self, urls: List[str]) -> List[Dict]:
         """Batch analyze multiple URLs"""
-        print(f"\n{'='*70}")
-        print(f"Batch analysis: {len(urls)} threads")
-        print(f"{'='*70}\n")
+        logger.info("=" * 70)
+        logger.info("Batch analysis: %d threads", len(urls))
+        logger.info("=" * 70)
 
         results = []
 
         for i, url in enumerate(urls, 1):
-            print(f"\n--- [{i}/{len(urls)}] ---")
+            logger.info("--- [%d/%d] ---", i, len(urls))
             result = self.analyze_single_thread(url)
             if result:
                 results.append(result)
@@ -256,10 +259,12 @@ class GoldmineFinder:
         with open(summary_file, 'w', encoding='utf-8') as f:
             f.write(report)
 
-        print(f"\nSummary report generated: {summary_file}")
+        logger.info("Summary report generated: %s", summary_file)
 
 
 def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
+
     parser = argparse.ArgumentParser(
         description="Reddit Goldmine Finder - Discover customer pain points and purchase intent with AI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -306,18 +311,16 @@ Examples:
                 urls = [line.strip() for line in f if line.strip()]
             finder.batch_analyze_urls(urls)
 
-        print("\n" + "="*70)
-        print("All analyses complete!")
-        print(f"Results saved in {args.output}/")
-        print("="*70 + "\n")
+        logger.info("=" * 70)
+        logger.info("All analyses complete!")
+        logger.info("Results saved in %s/", args.output)
+        logger.info("=" * 70)
 
     except KeyboardInterrupt:
-        print("\n\nInterrupted by user")
+        logger.info("Interrupted by user")
         sys.exit(0)
     except Exception as e:
-        print(f"\nError: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error("Error: %s", e, exc_info=True)
         sys.exit(1)
 
 
