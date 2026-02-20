@@ -63,6 +63,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+<!-- Replace with docs/demo.gif once recorded (see scripts/record_demo.sh) -->
 ![Web UI Screenshot](docs/screenshot_web_ui.png)
 
 **Features:**
