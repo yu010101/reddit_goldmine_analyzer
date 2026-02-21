@@ -66,7 +66,12 @@ class AIAnalyzer:
         all_comments = self._flatten_comments(thread_data.get('comments', []))
 
         # Extract comment texts
-        comment_texts = [c['body'] for c in all_comments if c['body'] and len(c['body']) > 10]
+        comment_texts = [
+            c['body'] for c in all_comments
+            if c['body']
+            and len(c['body']) > 10
+            and c['body'] not in ('[deleted]', '[removed]')
+        ]
 
         max_comments = cfg.MAX_COMMENTS
         total = len(comment_texts)
@@ -173,7 +178,10 @@ Important instructions:
                 response_format={"type": "json_object"}
             )
 
-            result_text = response.choices[0].message.content
+            result_text = response.choices[0].message.content.strip()
+            # Strip markdown code fences if present
+            if result_text.startswith("```"):
+                result_text = result_text.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
             result = json.loads(result_text)
 
             # Convert to PainPoint objects
@@ -195,6 +203,14 @@ Important instructions:
                 'sentiment_summary': result.get('sentiment_summary', '')
             }
 
+        except json.JSONDecodeError as e:
+            logger.error("AI returned invalid JSON: %s", e)
+            return {
+                'pain_points': [],
+                'key_insights': [],
+                'market_opportunities': [],
+                'sentiment_summary': 'Analysis failed: invalid response format'
+            }
         except Exception as e:
             logger.error("AI analysis error: %s", e)
             raise

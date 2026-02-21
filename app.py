@@ -749,8 +749,11 @@ def _esc(s):
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_sample(filename: str = "sample_analysis.json"):
-    with open(os.path.join(EXAMPLES_DIR, filename), "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(os.path.join(EXAMPLES_DIR, filename), "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        return None
 
 
 def _comment_to_dict(c):
@@ -899,8 +902,8 @@ def render_key_finding(data):
 
 
 def render_section(label, style="a", sub=""):
-    sub_html = f'<div class="gm-sec-sub">{sub}</div>' if sub else ""
-    _html(f'<div class="gm-sec-{style}"><div class="gm-sec-l">{label}</div>{sub_html}</div>')
+    sub_html = f'<div class="gm-sec-sub">{_esc(sub)}</div>' if sub else ""
+    _html(f'<div class="gm-sec-{style}"><div class="gm-sec-l">{_esc(label)}</div>{sub_html}</div>')
 
 
 def render_pain_point(pp, idx):
@@ -1079,9 +1082,13 @@ if mode == t("tab_sample"):
         index=0,
         key="sample_select",
     )
-    _sample_idx = _sample_labels.index(_sample_choice)
+    _sample_idx = _sample_labels.index(_sample_choice) if _sample_choice in _sample_labels else 0
     _sample_file = SAMPLE_CATALOG[_sample_idx]["file"]
-    render_analysis(load_sample(_sample_file))
+    _sample_data = load_sample(_sample_file)
+    if _sample_data is None:
+        st.error(t("err_analysis", detail="Sample data unavailable"))
+        st.stop()
+    render_analysis(_sample_data)
 
 # ── Tab: Discover ─────────────────────────────────────────────────────────
 
@@ -1224,7 +1231,7 @@ elif mode == t("tab_discover"):
                 )
             with _btn_col:
                 if st.button(t("discover_btn_analyze"), type="primary", key="disc_analyze"):
-                    _sel_idx = _thread_labels.index(_selected)
+                    _sel_idx = _thread_labels.index(_selected) if _selected in _thread_labels else 0
                     st.session_state.prefill_url = _posts[_sel_idx]["permalink"]
                     st.rerun()
     else:

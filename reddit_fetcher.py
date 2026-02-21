@@ -208,8 +208,12 @@ class RedditFetcher:
         )
 
         if len(data) > 1:
-            comments_listing = data[1]['data']['children']
-            thread.comments = self._parse_comments(comments_listing)
+            try:
+                comments_listing = data[1].get('data', {}).get('children', [])
+                thread.comments = self._parse_comments(comments_listing)
+            except (KeyError, TypeError) as e:
+                logger.warning("Failed to parse comments: %s", e)
+                thread.comments = []
 
         return thread
 

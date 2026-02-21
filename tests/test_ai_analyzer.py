@@ -45,6 +45,28 @@ class TestFlattenComments:
         assert bodies == ["parent", "child1", "child2", "grandchild"]
 
 
+class TestDeletedCommentFiltering:
+    """Verify [deleted] and [removed] comments are excluded."""
+
+    def setup_method(self):
+        self.analyzer = AIAnalyzer.__new__(AIAnalyzer)
+        self.analyzer.model = "gpt-4.1-mini"
+
+    def test_deleted_comments_excluded(self):
+        comments = [
+            {"body": "[deleted]", "replies": []},
+            {"body": "[removed]", "replies": []},
+            {"body": "This is a valid comment with enough length", "replies": []},
+            {"body": "short", "replies": []},
+        ]
+        flat = self.analyzer._flatten_comments(comments)
+        texts = [c['body'] for c in flat
+                 if c['body'] and len(c['body']) > 10
+                 and c['body'] not in ('[deleted]', '[removed]')]
+        assert len(texts) == 1
+        assert texts[0] == "This is a valid comment with enough length"
+
+
 class TestCommentCapping:
     """Tests that analyze_thread respects the comment limit"""
 
