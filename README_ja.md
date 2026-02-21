@@ -1,378 +1,232 @@
-# Reddit Goldmine Analyzer 🔍💰
+<div align="center">
 
-**AIを使ってRedditから「金脈」を爆速で発見するツール**
+# Reddit Goldmine Analyzer
 
-RedditのスレッドURLに `.json` を付けるだけで取得できる構造化データを活用し、AIで顧客の痛点・購買意欲・市場機会を大規模に抽出します。
+**AIでRedditスレッドから市場インサイトを自動抽出**
 
----
+顧客の痛点・購買意欲・市場機会を大規模に発見します。
 
-## 🎯 特徴
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/)
 
-### 1. **ワンステップでデータ取得**
-RedditのスレッドURLの末尾に `/.json` を付けるだけで、すべてのコメント・メタデータが構造化されたJSON形式で手に入ります。
+[ライブデモ](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/) · [CLI の使い方](#-cli-の使い方) · [クイックスタート](#-クイックスタート) · [English](README.md)
 
-### 2. **AIによる痛点抽出**
-- 人々の「痛点」を自動検出
-- 購買意欲の強さを分析 (High/Medium/Low/None)
-- カテゴリ別に分類 (マーケティング、財務、運用、技術など)
-
-### 3. **大規模分析**
-- 単一スレッド分析
-- サブレディット全体の分析
-- 複数URLのバッチ処理
-
-### 4. **実用的なレポート生成**
-- Markdown形式の読みやすいレポート
-- 購買意欲順にソートされた痛点リスト
-- 市場機会の提案
-- カテゴリ別統計
+</div>
 
 ---
 
-## 📦 インストール
+## できること
 
-### 必要要件
-- Python 3.11+
-- OpenAI API キー (環境変数 `OPENAI_API_KEY` に設定)
+RedditスレッドのURLを入力するだけで、人々が*本当にお金を払いたい*と思っている課題を構造化して抽出します。
 
-### セットアップ
+**出力例**（実際の r/Entrepreneur スレッドから）:
 
-```bash
-# リポジトリをクローン
-cd /path/to/reddit_goldmine_analyzer
+| 痛点 | 深刻度 | 購買意欲 | カテゴリ |
+|------|--------|---------|---------|
+| ハードウェアスタートアップの製造・流通の課題 | 🟠 HIGH | 💰💰💰 HIGH | 製造・オペレーション |
+| ポッドキャストの動画制作品質の低さ | 🟡 MEDIUM | 💰💰 MEDIUM | 制作品質 |
+| プラットフォーム間でのポッドキャスト配信の限界 | 🟡 MEDIUM | 💰 LOW | 配信・アクセス |
 
-# 依存パッケージをインストール
-pip install requests openai
+さらに**キーインサイト**、**市場機会**、**センチメント分析**も自動で抽出します。
 
-# 環境変数を設定 (既に設定済みの場合は不要)
-export OPENAI_API_KEY="your-api-key-here"
+---
+
+## 仕組み
+
+```
+1. 取得    →  RedditスレッドをJSON API経由で取得（認証不要）
+2. 分析    →  AIが痛点・購買意欲・市場機会を抽出
+3. レポート →  優先度付きのレポートを生成（Markdown + JSON）
+```
+
+**アーキテクチャ:**
+
+```
+Reddit URL → reddit_fetcher.py → ai_analyzer.py → レポート (MD + JSON)
+                                         ↑
+                                   OpenAI / GPT-4.1
 ```
 
 ---
 
-## 🚀 使い方
+## Web デモ
 
-### 1. 単一スレッドを分析
+ブラウザですぐに試せます。サンプルデータモードなら**APIキー不要**です。
+
+**[ライブデモを開く](https://redditgoldmineanalyzer-mtkdansfuhyqccwslcunwt.streamlit.app/)**
+
+ローカルで実行する場合:
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+![デモ](docs/demo.gif)
+
+**主な機能:**
+- **サンプルデータモード** — APIキー不要で分析結果をすぐ確認
+- **ライブ分析モード** — OpenAI APIキーを入力して任意のReddit URLをリアルタイム分析
+- 深刻度・購買意欲のカラーバッジ表示
+- コメント例の展開表示
+- 分析結果のワンクリックダウンロード
+
+---
+
+## CLI の使い方
+
+### 単一スレッドを分析
 
 ```bash
 python goldmine_finder.py --url "https://www.reddit.com/r/Entrepreneur/comments/xxx/"
 ```
 
-**出力**:
-- `output/thread_xxx.json` - 元のスレッドデータ
-- `output/analysis_xxx.json` - AI分析結果
-- `output/report_xxx.md` - 人間が読みやすいレポート
-
-### 2. サブレディット全体を分析
+### サブレディット全体をスキャン
 
 ```bash
 python goldmine_finder.py --subreddit Entrepreneur --limit 10 --min-comments 5
 ```
 
-**オプション**:
-- `--limit`: 取得する投稿数 (デフォルト: 10)
-- `--min-comments`: 最小コメント数 (デフォルト: 5)
-
-**出力**:
-- 各スレッドの個別レポート
-- `output/summary_Entrepreneur.md` - サマリーレポート
-
-### 3. 複数URLをバッチ分析
+### 複数URLをバッチ分析
 
 ```bash
-# URLリストファイルを作成 (1行1URL)
-cat > urls.txt << EOF
-https://www.reddit.com/r/SaaS/comments/xxx/
-https://www.reddit.com/r/startups/comments/yyy/
-https://www.reddit.com/r/Entrepreneur/comments/zzz/
-EOF
-
-# バッチ分析実行
-python goldmine_finder.py --batch urls.txt
+python goldmine_finder.py --batch urls.txt --output my_analysis/
 ```
 
-### 4. 出力先を指定
+**出力ファイル:**
+- `thread_xxx.json` — 生のスレッドデータ
+- `analysis_xxx.json` — AI分析結果
+- `report_xxx.md` — 人間が読めるレポート
+- `summary_xxx.md` — クロススレッドサマリー（サブレディット/バッチモード）
+
+---
+
+## クイックスタート
+
+### 1. クローン & インストール
 
 ```bash
-python goldmine_finder.py --subreddit SaaS --output my_analysis/
+git clone https://github.com/yu010101/reddit_goldmine_analyzer.git
+cd reddit_goldmine_analyzer
+pip install -r requirements.txt
 ```
 
----
-
-## 📊 レポートの見方
-
-### 痛点 (Pain Points)
-
-各痛点には以下の情報が含まれます:
-
-- **深刻度**: 🔴 Critical / 🟠 High / 🟡 Medium / 🟢 Low
-- **購買意欲**: 💰💰💰 High / 💰💰 Medium / 💰 Low / ⚫ None
-- **言及頻度**: コメント内で言及された回数
-- **カテゴリ**: 問題の分類
-- **実際のコメント例**: 生の声
-
-### サマリーレポート
-
-複数スレッドを分析した場合、以下が生成されます:
-
-1. **トップ痛点ランキング** - 購買意欲順にソート
-2. **カテゴリ別分析** - 各カテゴリの統計
-3. **統合市場機会** - 全スレッドから抽出された機会
-
----
-
-## 🛠️ モジュール構成
-
-### `reddit_fetcher.py`
-RedditのJSON APIからデータを取得・構造化するモジュール
-
-**主要クラス**:
-- `RedditFetcher`: データ取得
-- `Thread`: スレッドデータ
-- `Comment`: コメントデータ
-
-**主要メソッド**:
-- `fetch_thread(url)`: 単一スレッド取得
-- `fetch_subreddit_hot(subreddit, limit)`: ホット投稿取得
-- `save_to_json(thread, filepath)`: JSON保存
-
-### `ai_analyzer.py`
-AIを使って痛点・購買意欲を分析するモジュール
-
-**主要クラス**:
-- `AIAnalyzer`: AI分析エンジン
-- `PainPoint`: 痛点データ
-- `AnalysisResult`: 分析結果
-
-**主要メソッド**:
-- `analyze_thread(thread_data)`: スレッド分析
-- `generate_report(result)`: レポート生成
-- `save_analysis(result, filepath)`: 分析結果保存
-
-### `goldmine_finder.py`
-統合ツールのメインスクリプト
-
-**主要クラス**:
-- `GoldmineFinder`: 金脈発見ツール
-
-**主要メソッド**:
-- `analyze_single_thread(url)`: 単一スレッド分析
-- `analyze_subreddit(subreddit, limit, min_comments)`: サブレディット分析
-- `batch_analyze_urls(urls)`: バッチ分析
-
----
-
-## 💡 使用例
-
-### ニッチなサブレディットを探索
+### 2. デモを試す（APIキー不要）
 
 ```bash
-# SaaS起業家の痛点を発見
-python goldmine_finder.py --subreddit SaaS --limit 20
-
-# インディーハッカーの課題を分析
-python goldmine_finder.py --subreddit indiehackers --limit 15
-
-# 小規模ビジネスオーナーのニーズを調査
-python goldmine_finder.py --subreddit smallbusiness --limit 25
+python demo.py
 ```
 
-### 特定のトピックを深掘り
+### 3. Web UIを起動（サンプルデータはAPIキー不要）
 
 ```bash
-# 「痛点」に関するスレッドを検索してURLリストを作成
-# 各URLを分析
-python goldmine_finder.py --url "https://www.reddit.com/r/Entrepreneur/comments/xxx/what_are_your_biggest_pain_points/"
+streamlit run app.py
+```
+
+### 4. ライブデータを分析（OpenAI APIキーが必要）
+
+```bash
+export OPENAI_API_KEY="your-key-here"
+python goldmine_finder.py --url "https://www.reddit.com/r/SaaS/comments/xxx/"
+```
+
+### 5. Dockerで実行
+
+```bash
+docker compose up
 ```
 
 ---
 
-## 🔍 Reddit JSON API の仕組み
-
-### 基本的な使い方
-
-任意のReddit URLの末尾に `.json` を付けるだけ:
+## プロジェクト構成
 
 ```
-元のURL:
-https://www.reddit.com/r/Entrepreneur/comments/1pyxz90/episode_001/
-
-JSON API:
-https://www.reddit.com/r/Entrepreneur/comments/1pyxz90/episode_001/.json
+reddit_goldmine_analyzer/
+├── app.py                 # Streamlit Web UI
+├── goldmine_finder.py     # CLIツール（メインエントリポイント）
+├── reddit_fetcher.py      # Reddit JSON APIフェッチャー
+├── ai_analyzer.py         # AI分析エンジン
+├── config.py              # 設定の一元管理（環境変数でオーバーライド可）
+├── demo.py                # クイックデモスクリプト
+├── examples/              # サンプルデータ（APIキー不要で動作）
+│   ├── sample_thread.json
+│   ├── sample_analysis.json
+│   ├── sample_analysis_saas.json
+│   ├── sample_analysis_sideproject.json
+│   ├── sample_analysis_startups.json
+│   └── sample_report.md
+├── tests/                 # ユニット・統合テスト（pytest, 278件）
+├── docs/                  # ドキュメント（英語・日本語）
+├── Dockerfile             # コンテナセットアップ
+├── docker-compose.yml     # Docker Compose設定
+├── requirements.txt
+├── LICENSE
+├── README.md              # 英語版README
+└── README_ja.md           # 本ファイル（日本語）
 ```
-
-### データ構造
-
-```json
-[
-  {
-    "kind": "Listing",
-    "data": {
-      "children": [
-        {
-          "kind": "t3",
-          "data": {
-            "title": "スレッドタイトル",
-            "selftext": "本文",
-            "score": 123,
-            "num_comments": 45,
-            ...
-          }
-        }
-      ]
-    }
-  },
-  {
-    "kind": "Listing",
-    "data": {
-      "children": [
-        {
-          "kind": "t1",
-          "data": {
-            "author": "ユーザー名",
-            "body": "コメント本文",
-            "score": 10,
-            "replies": { ... }
-          }
-        }
-      ]
-    }
-  }
-]
-```
-
-- **data[0]**: 投稿本体
-- **data[1]**: コメントツリー
-- **kind**: オブジェクトタイプ (t1=コメント, t3=投稿)
 
 ---
 
-## ⚙️ 設定
+## 設定
 
-### AIモデルの変更
+### 環境変数によるオーバーライド
 
-`ai_analyzer.py` で使用するモデルを変更できます:
+`config.py` で定義された全設定は `RGA_` プレフィックス付き環境変数でオーバーライドできます:
+
+```bash
+RGA_MODEL=gpt-4.1-nano python goldmine_finder.py --url "..."
+RGA_RATE_LIMIT_DELAY=3 python goldmine_finder.py --subreddit SaaS
+```
+
+### AIモデル
 
 ```python
-analyzer = AIAnalyzer(model="gpt-4.1-mini")  # デフォルト
-# または
-analyzer = AIAnalyzer(model="gpt-4.1-nano")  # より高速・低コスト
+analyzer = AIAnalyzer(model="gpt-4.1-mini")   # デフォルト（バランス型）
+analyzer = AIAnalyzer(model="gpt-4.1-nano")   # より高速・低コスト
 ```
 
-### レート制限の調整
-
-`reddit_fetcher.py` でレート制限を調整:
+### レート制限
 
 ```python
 fetcher = RedditFetcher()
-fetcher.rate_limit_delay = 3  # 3秒間隔 (デフォルト: 2秒)
+fetcher.rate_limit_delay = 3  # リクエスト間隔（デフォルト: 2秒）
 ```
 
 ---
 
-## 📈 実践的なワークフロー
+## コスト
 
-### 1. ニッチ市場の発見
+- 1スレッドあたり約 $0.01〜0.05（GPT-4.1-mini使用時）
+- Reddit APIは無料（公開JSONエンドポイント、認証不要）
+
+---
+
+## テスト
 
 ```bash
-# ステップ1: 複数のニッチサブレディットを分析
-python goldmine_finder.py --subreddit SaaS --limit 20 --output saas_analysis/
-python goldmine_finder.py --subreddit indiehackers --limit 20 --output indie_analysis/
-python goldmine_finder.py --subreddit nocode --limit 20 --output nocode_analysis/
-
-# ステップ2: サマリーレポートを確認
-cat saas_analysis/summary_SaaS.md
-cat indie_analysis/summary_indiehackers.md
-cat nocode_analysis/summary_nocode.md
-
-# ステップ3: 購買意欲が高い痛点を特定
-# ステップ4: 製品・サービスのアイデアを検証
+pip install -r requirements-dev.txt
+python -m pytest tests/ -q
 ```
 
-### 2. 競合分析
-
-```bash
-# 競合製品に関するスレッドを分析
-python goldmine_finder.py --url "https://www.reddit.com/r/SaaS/comments/xxx/alternatives_to_competitor/"
-
-# ユーザーの不満点を抽出
-# 自社製品の差別化ポイントを発見
-```
-
-### 3. 継続的なモニタリング
-
-```bash
-# 定期的に実行するスクリプトを作成
-cat > monitor.sh << 'EOF'
-#!/bin/bash
-DATE=$(date +%Y%m%d)
-python goldmine_finder.py --subreddit Entrepreneur --limit 10 --output "daily_$DATE/"
-EOF
-
-chmod +x monitor.sh
-
-# cronで毎日実行
-# 0 9 * * * /path/to/monitor.sh
-```
+278テスト全パス。セキュリティ監査テスト、XSSエスケープ検証を含みます。
 
 ---
 
-## 🎓 ベストプラクティス
+## ライセンス
 
-### 1. ターゲットを絞る
-- ニッチなサブレディットほど具体的な痛点が見つかる
-- 大規模サブレディットは一般的な問題が多い
-
-### 2. コメント数でフィルタリング
-- `--min-comments 10` などで活発なディスカッションに絞る
-- 購買意欲の高い痛点が見つかりやすい
-
-### 3. 複数の視点で分析
-- 同じトピックを複数のサブレディットで分析
-- パターンの一貫性を確認
-
-### 4. 実際のコメントを読む
-- AIの分析結果だけでなく、元のコメントも確認
-- ニュアンスや文脈を理解する
+[MIT](LICENSE)
 
 ---
 
-## 🚨 注意事項
+## コントリビュート
 
-### Reddit API利用規約
-- レート制限を守る (デフォルト: 2秒間隔)
-- 商用利用の場合はReddit APIの公式ドキュメントを確認
-- User-Agentを適切に設定
-
-### データプライバシー
-- 公開データのみを使用
-- 個人情報の取り扱いに注意
-
-### AI分析の限界
-- AIの分析結果は参考情報
-- 最終的な判断は人間が行う
-- 誤検出や見落としの可能性がある
+Issue・プルリクエスト歓迎です!
 
 ---
 
-## 🤝 貢献
+<div align="center">
 
-バグ報告、機能リクエスト、プルリクエストを歓迎します!
+**Happy Goldmining!**
 
----
-
-## 📝 ライセンス
-
-MIT License
-
----
-
-## 🙏 謝辞
-
-- Reddit JSON API
-- OpenAI API
-- すべてのオープンソースコントリビューター
-
----
-
-**Happy Goldmining! 💰🔍**
+</div>
